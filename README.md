@@ -19,10 +19,3 @@ Complete an order, click **Print Receipt**, and choose a printer or "Save as PDF
 Only the receipt is printed (the menu, sidebar, and dashboard are hidden).
 
 
-
-## Notes
-- Orders are stored in the browser you use. Another browser or device will have its own separate history.
-- Clearing browser data also deletes saved orders.
-
-## Author
-Your Name – University of Gujrat
