@@ -1,4 +1,4 @@
-/* ===== Colors and basics ===== */
+/*Colors*/
 :root {
   --cream: #faf3e8;
   --cream-dark: #f0e4d0;
@@ -26,7 +26,7 @@ body {
 .hidden { display: none !important; }
 .num { text-align: right; }
 
-/* ===== Layout: sidebar + content ===== */
+/*Layout */
 .app { display: flex; min-height: 100vh; }
 
 .sidebar {
@@ -73,7 +73,7 @@ body {
 }
 .page-header h2 { margin: 0; color: var(--brown-dark); }
 
-/* ===== Buttons ===== */
+
 .btn {
   padding: 10px 16px;
   border-radius: 8px;
@@ -88,7 +88,7 @@ body {
 .btn-outline:hover { background: var(--cream-dark); }
 .btn-small { padding: 6px 10px; font-size: 13px; }
 
-/* ===== Dashboard ===== */
+/* Dashboard */
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -117,14 +117,14 @@ body {
 .panel h3 { margin-top: 0; color: var(--brown-dark); }
 .empty-text { color: var(--muted); margin: 8px 0; }
 
-/* ===== Tables ===== */
+/* Tables */
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
 th { background: var(--cream); color: var(--brown-dark); }
 th.num, td.num { text-align: right; }
 
-/* ===== New Order page ===== */
+
 .order-layout {
   display: grid;
   grid-template-columns: 1fr 370px;
@@ -167,7 +167,7 @@ th.num, td.num { text-align: right; }
 .product-card .name { font-weight: 600; text-align: center; }
 .product-card .price { color: var(--accent); font-weight: 700; }
 
-/* ===== Cart ===== */
+/* Cart */
 .cart-panel {
   background: var(--white);
   border: 1px solid var(--border);
@@ -223,7 +223,7 @@ th.num, td.num { text-align: right; }
 .cart-actions { display: flex; gap: 10px; }
 .cart-actions .btn { flex: 1; }
 
-/* ===== Modal + receipt ===== */
+/* Receipt*/
 .modal {
   position: fixed;
   inset: 0;
@@ -258,7 +258,7 @@ th.num, td.num { text-align: right; }
 .receipt-totals .grand { font-size: 16px; font-weight: bold; border-top: 1px solid #000; padding-top: 5px; margin-top: 5px; }
 .receipt-footer { text-align: center; border-top: 2px dashed #000; margin-top: 10px; padding-top: 10px; }
 
-/* ===== Responsive (tablets and phones) ===== */
+
 @media (max-width: 1000px) {
   .order-layout { grid-template-columns: 1fr; }
   .cart-panel { position: static; }
@@ -274,12 +274,12 @@ th.num, td.num { text-align: right; }
   .product-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
 }
 
-/* ===== Printing: show ONLY the receipt ===== */
+
 @media print {
   @page { margin: 10mm; }
   body { background: #fff; }
-  .app { display: none !important; }       /* hides sidebar, dashboard, menu, cart, etc. */
-  .no-print { display: none !important; }  /* hides Print/Close buttons */
+  .app { display: none !important; }     
+  .no-print { display: none !important; }  
   .modal {
     position: static;
     background: none;
