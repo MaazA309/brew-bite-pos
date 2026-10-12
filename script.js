@@ -1,10 +1,4 @@
-// =====================================================
-//  Brew & Bite Café – POS system (plain JavaScript)
-// =====================================================
 
-// ---------- 1. DATA ----------
-
-// The menu. Each product has an id, name, category, price (Rs.) and an emoji icon.
 const MENU = [
   { id: 1,  name: "Espresso",        category: "Coffee",   price: 250, icon: "☕" },
   { id: 2,  name: "Cappuccino",      category: "Coffee",   price: 350, icon: "☕" },
@@ -22,26 +16,23 @@ const MENU = [
   { id: 14, name: "Cookies",         category: "Desserts", price: 120, icon: "🍪" }
 ];
 
-// Keys used to save data in the browser's localStorage
 const ORDERS_KEY  = "bb_orders";
 const COUNTER_KEY = "bb_order_counter";
 const TAX_KEY     = "bb_tax_percent";
 
-// ---------- 2. STATE (data that changes while the app runs) ----------
 
-let cart = [];                 // items in the cart: { id, qty }
-let currentCategory = "All";   // which filter is selected
-let orders = loadOrders();     // all completed orders (loaded from localStorage)
+
+let cart = [];                 
+let currentCategory = "All";   
+let orders = loadOrders();     
 let taxPercent = loadTaxPercent();
 
-// Shortcut for document.getElementById
+
 function $(id) {
   return document.getElementById(id);
 }
 
-// ---------- 3. LOCALSTORAGE HELPERS ----------
 
-// Read a value from localStorage (returns null if it fails)
 function readStorage(key) {
   try {
     return localStorage.getItem(key);
@@ -50,7 +41,7 @@ function readStorage(key) {
   }
 }
 
-// Write a value to localStorage (returns true if it worked)
+
 function writeStorage(key, value) {
   try {
     localStorage.setItem(key, value);
@@ -60,7 +51,7 @@ function writeStorage(key, value) {
   }
 }
 
-// Load saved orders. If nothing is saved (or data is broken), return an empty list.
+
 function loadOrders() {
   try {
     const saved = JSON.parse(readStorage(ORDERS_KEY) || "[]");
@@ -70,7 +61,7 @@ function loadOrders() {
   }
 }
 
-// Save the orders list
+
 function saveOrders() {
   const ok = writeStorage(ORDERS_KEY, JSON.stringify(orders));
   if (!ok) {
@@ -78,7 +69,7 @@ function saveOrders() {
   }
 }
 
-// Load the saved tax rate (default is 5%)
+
 function loadTaxPercent() {
   const saved = parseFloat(readStorage(TAX_KEY));
   if (!isNaN(saved) && saved >= 0 && saved <= 100) {
@@ -87,7 +78,7 @@ function loadTaxPercent() {
   return 5;
 }
 
-// Create the next order number like BB-0001, BB-0002 ...
+
 function createOrderNumber() {
   const lastNumber = parseInt(readStorage(COUNTER_KEY), 10) || 0;
   const next = Math.max(lastNumber, orders.length) + 1;
@@ -95,9 +86,7 @@ function createOrderNumber() {
   return "BB-" + String(next).padStart(4, "0");
 }
 
-// ---------- 4. FORMATTING HELPERS ----------
 
-// Format a number as Pakistani Rupees, e.g. 1234.5 -> "Rs. 1,234.50"
 function formatMoney(amount) {
   return "Rs. " + amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
@@ -105,7 +94,7 @@ function formatMoney(amount) {
   });
 }
 
-// Format a saved date string for display
+
 function formatDate(isoString) {
   return new Date(isoString).toLocaleString("en-GB", {
     day: "2-digit", month: "short", year: "numeric",
@@ -113,14 +102,11 @@ function formatDate(isoString) {
   });
 }
 
-// Find a product in the menu by its id
+
 function findProduct(id) {
   return MENU.find(function (product) { return product.id === id; });
 }
 
-// ---------- 5. NAVIGATION ----------
-
-// Show one section (dashboard / order / history) and hide the others
 function showView(viewName) {
   document.querySelectorAll(".view").forEach(function (section) {
     section.classList.toggle("active", section.id === viewName);
@@ -129,15 +115,13 @@ function showView(viewName) {
     btn.classList.toggle("active", btn.dataset.view === viewName);
   });
 
-  // Refresh the data of the page we are opening
+
   if (viewName === "dashboard") renderDashboard();
   if (viewName === "history") renderHistory();
   window.scrollTo(0, 0);
 }
 
-// ---------- 6. MENU ----------
 
-// Draw the product cards for the selected category
 function renderMenu() {
   const items = MENU.filter(function (product) {
     return currentCategory === "All" || product.category === currentCategory;
@@ -152,7 +136,7 @@ function renderMenu() {
   }).join("");
 }
 
-// ---------- 7. CART ----------
+
 
 // Add a product to the cart (or increase its quantity if already there)
 function addToCart(id) {
@@ -166,7 +150,7 @@ function addToCart(id) {
   renderCart();
 }
 
-// Increase (+1) or decrease (-1) the quantity. Quantity 0 removes the item.
+
 function changeQuantity(id, change) {
   const item = cart.find(function (cartItem) { return cartItem.id === id; });
   if (!item) return;
@@ -177,28 +161,27 @@ function changeQuantity(id, change) {
   else renderCart();
 }
 
-// Remove an item completely
+
 function removeFromCart(id) {
   cart = cart.filter(function (item) { return item.id !== id; });
   renderCart();
 }
 
-// Empty the cart
+
 function clearCart() {
   cart = [];
   setMessage("", "");
   renderCart();
 }
 
-// Work out subtotal, tax and total.
-// Tax is calculated in paisa (1 Rs. = 100 paisa) and rounded, so there are no floating-point errors.
+
 function calculateTotals() {
   let subtotal = 0;
   cart.forEach(function (item) {
     subtotal += findProduct(item.id).price * item.qty;
   });
 
-  const taxPaisa = Math.round(subtotal * taxPercent);   // subtotal * (percent / 100) * 100 paisa
+  const taxPaisa = Math.round(subtotal * taxPercent);   
   const totalPaisa = subtotal * 100 + taxPaisa;
 
   return {
@@ -208,7 +191,7 @@ function calculateTotals() {
   };
 }
 
-// Redraw the cart and its totals
+
 function renderCart() {
   if (cart.length === 0) {
     $("cart-items").innerHTML = '<p class="cart-empty">Your cart is empty.<br>Tap a menu item to add it.</p>';
@@ -236,18 +219,16 @@ function renderCart() {
   $("cart-tax-label").textContent = taxPercent;
 }
 
-// Show a message under the cart. type is "error", "success" or "".
+
 function setMessage(text, type) {
   const box = $("cart-message");
   box.textContent = text;
   box.className = "message " + type;
 }
 
-// ---------- 8. CHECKOUT ----------
 
-// Finish the order: validate, save, show the receipt
 function completeOrder() {
-  // Validation: an empty cart cannot be checked out
+  
   if (cart.length === 0) {
     setMessage("The cart is empty. Add at least one item first.", "error");
     return;
@@ -256,7 +237,7 @@ function completeOrder() {
   const totals = calculateTotals();
   const payment = document.querySelector('input[name="payment"]:checked').value;
 
-  // Copy item details into the order, so later menu changes don't affect old receipts
+  
   let itemCount = 0;
   const items = cart.map(function (cartItem) {
     const product = findProduct(cartItem.id);
@@ -284,7 +265,7 @@ function completeOrder() {
   orders.push(order);
   saveOrders();
 
-  // Reset the cart for the next customer, then show the receipt
+  
   cart = [];
   setMessage("", "");
   renderCart();
@@ -292,9 +273,7 @@ function completeOrder() {
   showReceipt(order);
 }
 
-// ---------- 9. RECEIPT ----------
-
-// Build the receipt HTML for an order
+//Reciept
 function buildReceiptHTML(order) {
   const rows = order.items.map(function (item) {
     return '<tr>' +
@@ -331,18 +310,18 @@ function buildReceiptHTML(order) {
          '</div>';
 }
 
-// Open the receipt window
+
 function showReceipt(order) {
   $("receipt-content").innerHTML = buildReceiptHTML(order);
   $("receipt-modal").classList.remove("hidden");
 }
 
-// Close the receipt window
+
 function closeReceipt() {
   $("receipt-modal").classList.add("hidden");
 }
 
-// ---------- 10. DASHBOARD ----------
+//Dashboard
 
 function renderDashboard() {
   let totalSales = 0;
@@ -356,7 +335,7 @@ function renderDashboard() {
   $("stat-orders").textContent = orders.length;
   $("stat-items").textContent = totalItems;
 
-  // Show the 5 most recent orders (newest first)
+  
   const recent = orders.slice(-5).reverse();
   $("recent-empty").classList.toggle("hidden", recent.length > 0);
   $("recent-table").classList.toggle("hidden", recent.length === 0);
@@ -372,7 +351,7 @@ function renderDashboard() {
   }).join("");
 }
 
-// ---------- 11. SALES HISTORY ----------
+
 
 function renderHistory() {
   const list = orders.slice().reverse();   // newest first
@@ -391,7 +370,6 @@ function renderHistory() {
   }).join("");
 }
 
-// Delete all saved orders (asks for confirmation first)
 function clearHistory() {
   if (orders.length === 0) {
     alert("There is no history to clear.");
@@ -406,16 +384,13 @@ function clearHistory() {
   }
 }
 
-// ---------- 12. EVENT LISTENERS (connect buttons to functions) ----------
-
-// Any element with data-view switches the page (sidebar buttons + "New Order" button)
 document.querySelectorAll("[data-view]").forEach(function (element) {
   element.addEventListener("click", function () {
     showView(element.dataset.view);
   });
 });
 
-// Category filters
+
 document.querySelectorAll(".filter-btn").forEach(function (btn) {
   btn.addEventListener("click", function () {
     currentCategory = btn.dataset.category;
@@ -426,13 +401,12 @@ document.querySelectorAll(".filter-btn").forEach(function (btn) {
   });
 });
 
-// Clicking a product card adds it to the cart
+
 $("product-grid").addEventListener("click", function (event) {
   const card = event.target.closest(".product-card");
   if (card) addToCart(Number(card.dataset.id));
 });
 
-// +, - and remove buttons inside the cart
 $("cart-items").addEventListener("click", function (event) {
   const btn = event.target.closest("button[data-action]");
   if (!btn) return;
@@ -443,7 +417,7 @@ $("cart-items").addEventListener("click", function (event) {
   if (btn.dataset.action === "remove") removeFromCart(id);
 });
 
-// Tax rate input: update live when valid, fix it when the user leaves the field if invalid
+
 $("tax-rate").addEventListener("input", function () {
   const text = $("tax-rate").value.trim();
   const value = Number(text);
@@ -460,18 +434,18 @@ $("tax-rate").addEventListener("change", function () {
   const value = Number(text);
   if (text === "" || isNaN(value) || value < 0 || value > 100) {
     setMessage("Tax must be a number between 0 and 100.", "error");
-    $("tax-rate").value = taxPercent;   // put the last valid value back
+    $("tax-rate").value = taxPercent;   
   }
 });
 
 $("clear-cart-btn").addEventListener("click", clearCart);
 $("complete-order-btn").addEventListener("click", completeOrder);
 
-// Receipt window buttons
+
 $("print-btn").addEventListener("click", function () { window.print(); });
 $("close-receipt-btn").addEventListener("click", closeReceipt);
 
-// Click on the dark background or press Escape to close the receipt
+
 $("receipt-modal").addEventListener("click", function (event) {
   if (event.target === $("receipt-modal")) closeReceipt();
 });
@@ -479,7 +453,7 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") closeReceipt();
 });
 
-// Sales history: "View / Print" opens the saved receipt again
+
 $("history-body").addEventListener("click", function (event) {
   const btn = event.target.closest("button[data-order]");
   if (!btn) return;
@@ -489,7 +463,7 @@ $("history-body").addEventListener("click", function (event) {
 
 $("clear-history-btn").addEventListener("click", clearHistory);
 
-// ---------- 13. START THE APP ----------
+
 $("tax-rate").value = taxPercent;
 renderMenu();
 renderCart();
