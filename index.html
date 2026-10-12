@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brew &amp; Bite Café – POS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Everything except the receipt modal lives inside .app (hidden when printing) -->
+  <div class="app">
+
+    <!-- Sidebar navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-icon">☕</span>
+        <div>
+          <h1>Brew &amp; Bite</h1>
+          <p>Café POS</p>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-view="dashboard">📊 Dashboard</button>
+        <button class="nav-btn" data-view="order">🧾 New Order</button>
+        <button class="nav-btn" data-view="history">📚 Sales History</button>
+      </nav>
+    </aside>
+
+    <main class="content">
+
+      <!-- ============ A. DASHBOARD ============ -->
+      <section id="dashboard" class="view active">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <button class="btn btn-primary" data-view="order">+ New Order</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat-card">
+            <span class="stat-label">Total Sales</span>
+            <span class="stat-value" id="stat-sales">Rs. 0.00</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Completed Orders</span>
+            <span class="stat-value" id="stat-orders">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Items Sold</span>
+            <span class="stat-value" id="stat-items">0</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Recent Orders</h3>
+          <p id="recent-empty" class="empty-text">No orders yet. Complete an order and it will show up here.</p>
+          <div class="table-wrap">
+            <table id="recent-table">
+              <thead>
+                <tr>
+                  <th>Order No.</th>
+                  <th>Date &amp; Time</th>
+                  <th>Items</th>
+                  <th>Payment</th>
+                  <th class="num">Total</th>
+                </tr>
+              </thead>
+              <tbody id="recent-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ B. NEW ORDER ============ -->
+      <section id="order" class="view">
+        <div class="page-header">
+          <h2>New Order</h2>
+        </div>
+
+        <div class="order-layout">
+
+          <!-- Menu -->
+          <div class="menu-panel">
+            <div class="filters">
+              <button class="filter-btn active" data-category="All">All Items</button>
+              <button class="filter-btn" data-category="Coffee">Coffee</button>
+              <button class="filter-btn" data-category="Tea">Tea</button>
+              <button class="filter-btn" data-category="Food">Food</button>
+              <button class="filter-btn" data-category="Desserts">Desserts</button>
+            </div>
+            <div id="product-grid" class="product-grid"></div>
+          </div>
+
+          <!-- Cart -->
+          <aside class="cart-panel">
+            <h3>Current Order</h3>
+
+            <div id="cart-items" class="cart-items"></div>
+
+            <div class="tax-row">
+              <label for="tax-rate">Tax rate (%)</label>
+              <input type="number" id="tax-rate" min="0" max="100" step="0.5" value="5">
+            </div>
+
+            <div class="totals">
+              <div class="total-row"><span>Subtotal</span><span id="cart-subtotal">Rs. 0.00</span></div>
+              <div class="total-row"><span>Tax (<span id="cart-tax-label">5</span>%)</span><span id="cart-tax">Rs. 0.00</span></div>
+              <div class="total-row grand"><span>Total</span><span id="cart-total">Rs. 0.00</span></div>
+            </div>
+
+            <div class="payment">
+              <span class="payment-title">Payment method</span>
+              <label><input type="radio" name="payment" value="Cash" checked> Cash</label>
+              <label><input type="radio" name="payment" value="Card"> Card</label>
+            </div>
+
+            <p id="cart-message" class="message"></p>
+
+            <div class="cart-actions">
+              <button id="clear-cart-btn" class="btn btn-outline">Clear Cart</button>
+              <button id="complete-order-btn" class="btn btn-primary">Complete Order</button>
+            </div>
+          </aside>
+
+        </div>
+      </section>
+
+      <!-- ============ D. SALES HISTORY ============ -->
+      <section id="history" class="view">
+        <div class="page-header">
+          <h2>Sales History</h2>
+          <button id="clear-history-btn" class="btn btn-outline">Clear All History</button>
+        </div>
+
+        <div class="panel">
+          <p id="history-empty" class="empty-text">No saved orders yet.</p>
+          <div class="table-wrap">
+            <table id="history-table">
+              <thead>
+                <tr>
+                  <th>Order No.</th>
+                  <th>Date &amp; Time</th>
+                  <th>Items</th>
+                  <th>Payment</th>
+                  <th class="num">Total</th>
+                  <th>Receipt</th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============ C. RECEIPT (modal) ============ -->
+  <div id="receipt-modal" class="modal hidden">
+    <div class="modal-box">
+      <div id="receipt-content"></div>
+      <div class="modal-actions no-print">
+        <button id="print-btn" class="btn btn-primary">🖨 Print Receipt</button>
+        <button id="close-receipt-btn" class="btn btn-outline">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
