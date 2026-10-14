@@ -13,7 +13,8 @@ const MENU = [
   { id: 11, name: "Chicken Wrap",    category: "Food",     price: 350, icon: "🌯" },
   { id: 12, name: "Chocolate Brownie", category: "Desserts", price: 200, icon: "🍫" },
   { id: 13, name: "Chocolate Cake",  category: "Desserts", price: 300, icon: "🍰" },
-  { id: 14, name: "Cookies",         category: "Desserts", price: 120, icon: "🍪" }
+  { id: 14, name: "Cookies",         category: "Desserts", price: 120, icon: "🍪" },
+  { id: 15, name: "Croissant",       category: "Food",     price:220, icon: "🥐"}
 ];
 
 const ORDERS_KEY  = "bb_orders";
