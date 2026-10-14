@@ -147,7 +147,7 @@ th.num, td.num { text-align: right; }
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 14px;
+  gap: 36px;
 }
 .product-card {
   background: var(--white);
