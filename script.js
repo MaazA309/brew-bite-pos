@@ -1,38 +1,39 @@
-
 const MENU = [
-  { id: 1,  name: "Espresso",        category: "Coffee",   price: 250, icon: "☕" },
-  { id: 2,  name: "Cappuccino",      category: "Coffee",   price: 350, icon: "☕" },
-  { id: 3,  name: "Latte",           category: "Coffee",   price: 350, icon: "🥛" },
-  { id: 4,  name: "Iced Coffee",     category: "Coffee",   price: 400, icon: "🥤" },
-  { id: 5,  name: "Milk Tea",        category: "Tea",      price: 150, icon: "🫖" },
-  { id: 6,  name: "Green Tea",       category: "Tea",      price: 180, icon: "🍵" },
-  { id: 7,  name: "Masala Chai",     category: "Tea",      price: 200, icon: "🫖" },
-  { id: 8,  name: "Chicken Burger",  category: "Food",     price: 450, icon: "🍔" },
-  { id: 9,  name: "Club Sandwich",   category: "Food",     price: 400, icon: "🥪" },
-  { id: 10, name: "French Fries",    category: "Food",     price: 250, icon: "🍟" },
-  { id: 11, name: "Chicken Wrap",    category: "Food",     price: 350, icon: "🌯" },
+  { id: 1,  name: "Espresso",          category: "Coffee",   price: 250, icon: "☕" },
+  { id: 2,  name: "Cappuccino",        category: "Coffee",   price: 350, icon: "☕" },
+  { id: 3,  name: "Latte",             category: "Coffee",   price: 350, icon: "🥛" },
+  { id: 4,  name: "Iced Coffee",       category: "Coffee",   price: 400, icon: "🥤" },
+  { id: 5,  name: "Milk Tea",          category: "Tea",      price: 150, icon: "🫖" },
+  { id: 6,  name: "Green Tea",         category: "Tea",      price: 180, icon: "🍵" },
+  { id: 7,  name: "Masala Chai",       category: "Tea",      price: 200, icon: "🫖" },
+  { id: 8,  name: "Chicken Burger",    category: "Food",     price: 450, icon: "🍔" },
+  { id: 9,  name: "Club Sandwich",     category: "Food",     price: 400, icon: "🥪" },
+  { id: 10, name: "French Fries",      category: "Food",     price: 250, icon: "🍟" },
+  { id: 11, name: "Chicken Wrap",      category: "Food",     price: 350, icon: "🌯" },
   { id: 12, name: "Chocolate Brownie", category: "Desserts", price: 200, icon: "🍫" },
-  { id: 13, name: "Chocolate Cake",  category: "Desserts", price: 300, icon: "🍰" },
-  { id: 14, name: "Cookies",         category: "Desserts", price: 120, icon: "🍪" },
-  { id: 15, name: "Croissant",       category: "Food",     price:220, icon: "🥐"}
+  { id: 13, name: "Chocolate Cake",    category: "Desserts", price: 300, icon: "🍰" },
+  { id: 14, name: "Cookies",           category: "Desserts", price: 120, icon: "🍪" },
+  { id: 15, name: "Croissant",         category: "Desserts", price: 220, icon: "🥐" },
+  { id: 16, name: "Egg",               category: "Food",     price: 100, icon: "🥚"},
+  { id: 17, name: "Mocha",           category: "Coffee",   price: 380, icon: "☕" },
+  { id: 18, name: "Pizza Slice",     category: "Food",     price: 500, icon: "🍕" },
+  { id: 19, name: "Chicken Nuggets", category: "Food",     price: 300, icon: "🍗" },
+  { id: 20, name: "Cheesecake",      category: "Desserts", price: 350, icon: "🍰" }
 ];
 
 const ORDERS_KEY  = "bb_orders";
 const COUNTER_KEY = "bb_order_counter";
 const TAX_KEY     = "bb_tax_percent";
 
-
-
-let cart = [];                 
-let currentCategory = "All";   
-let orders = loadOrders();     
+let cart = [];
+let currentCategory = "All";
+let orders = loadOrders();
 let taxPercent = loadTaxPercent();
-
+let searchText = "";
 
 function $(id) {
   return document.getElementById(id);
 }
-
 
 function readStorage(key) {
   try {
@@ -41,7 +42,6 @@ function readStorage(key) {
     return null;
   }
 }
-
 
 function writeStorage(key, value) {
   try {
@@ -52,7 +52,6 @@ function writeStorage(key, value) {
   }
 }
 
-
 function loadOrders() {
   try {
     const saved = JSON.parse(readStorage(ORDERS_KEY) || "[]");
@@ -62,14 +61,12 @@ function loadOrders() {
   }
 }
 
-
 function saveOrders() {
   const ok = writeStorage(ORDERS_KEY, JSON.stringify(orders));
   if (!ok) {
     alert("Warning: the order could not be saved in this browser.");
   }
 }
-
 
 function loadTaxPercent() {
   const saved = parseFloat(readStorage(TAX_KEY));
@@ -79,14 +76,12 @@ function loadTaxPercent() {
   return 5;
 }
 
-
 function createOrderNumber() {
   const lastNumber = parseInt(readStorage(COUNTER_KEY), 10) || 0;
   const next = Math.max(lastNumber, orders.length) + 1;
   writeStorage(COUNTER_KEY, String(next));
   return "BB-" + String(next).padStart(4, "0");
 }
-
 
 function formatMoney(amount) {
   return "Rs. " + amount.toLocaleString("en-US", {
@@ -95,7 +90,6 @@ function formatMoney(amount) {
   });
 }
 
-
 function formatDate(isoString) {
   return new Date(isoString).toLocaleString("en-GB", {
     day: "2-digit", month: "short", year: "numeric",
@@ -103,9 +97,33 @@ function formatDate(isoString) {
   });
 }
 
+function formatDateOnly(isoString) {
+  return new Date(isoString).toLocaleDateString("en-GB", {
+    day: "2-digit", month: "short", year: "numeric"
+  });
+}
+
+function formatTimeOnly(isoString) {
+  return new Date(isoString).toLocaleTimeString("en-GB", {
+    hour: "2-digit", minute: "2-digit"
+  });
+}
 
 function findProduct(id) {
   return MENU.find(function (product) { return product.id === id; });
+}
+
+function escapeHTML(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function getCustomerName(order) {
+  return order.customerName || "Walk-in Customer";
 }
 
 function showView(viewName) {
@@ -116,17 +134,26 @@ function showView(viewName) {
     btn.classList.toggle("active", btn.dataset.view === viewName);
   });
 
-
   if (viewName === "dashboard") renderDashboard();
   if (viewName === "history") renderHistory();
   window.scrollTo(0, 0);
 }
 
-
 function renderMenu() {
+  const text = searchText.trim().toLowerCase();
+
   const items = MENU.filter(function (product) {
-    return currentCategory === "All" || product.category === currentCategory;
+    const matchesCategory = currentCategory === "All" || product.category === currentCategory;
+    const matchesSearch = text === "" ||
+      product.name.toLowerCase().includes(text) ||
+      product.category.toLowerCase().includes(text);
+    return matchesCategory && matchesSearch;
   });
+
+  if (items.length === 0) {
+    $("product-grid").innerHTML = '<p class="no-results">No items found. Try a different search.</p>';
+    return;
+  }
 
   $("product-grid").innerHTML = items.map(function (product) {
     return '<button class="product-card" data-id="' + product.id + '">' +
@@ -137,9 +164,6 @@ function renderMenu() {
   }).join("");
 }
 
-
-
-// Add a product to the cart (or increase its quantity if already there)
 function addToCart(id) {
   const existing = cart.find(function (item) { return item.id === id; });
   if (existing) {
@@ -151,7 +175,6 @@ function addToCart(id) {
   renderCart();
 }
 
-
 function changeQuantity(id, change) {
   const item = cart.find(function (cartItem) { return cartItem.id === id; });
   if (!item) return;
@@ -162,19 +185,17 @@ function changeQuantity(id, change) {
   else renderCart();
 }
 
-
 function removeFromCart(id) {
   cart = cart.filter(function (item) { return item.id !== id; });
   renderCart();
 }
 
-
 function clearCart() {
   cart = [];
+  $("cash-received").value = "";
   setMessage("", "");
   renderCart();
 }
-
 
 function calculateTotals() {
   let subtotal = 0;
@@ -182,7 +203,7 @@ function calculateTotals() {
     subtotal += findProduct(item.id).price * item.qty;
   });
 
-  const taxPaisa = Math.round(subtotal * taxPercent);   
+  const taxPaisa = Math.round(subtotal * taxPercent);
   const totalPaisa = subtotal * 100 + taxPaisa;
 
   return {
@@ -192,6 +213,23 @@ function calculateTotals() {
   };
 }
 
+function updateChange() {
+  const payment = document.querySelector('input[name="payment"]:checked').value;
+  const isCash = payment === "Cash";
+  $("cash-row").classList.toggle("hidden", !isCash);
+  $("change-row").classList.toggle("hidden", !isCash);
+
+  const text = $("cash-received").value.trim();
+  const received = Number(text);
+  const total = calculateTotals().total;
+
+  let change = 0;
+  if (cart.length > 0 && text !== "" && !isNaN(received) &&
+      Math.round(received * 100) >= Math.round(total * 100)) {
+    change = Math.round((received - total) * 100) / 100;
+  }
+  $("change-due").textContent = formatMoney(change);
+}
 
 function renderCart() {
   if (cart.length === 0) {
@@ -218,8 +256,9 @@ function renderCart() {
   $("cart-tax").textContent = formatMoney(totals.tax);
   $("cart-total").textContent = formatMoney(totals.total);
   $("cart-tax-label").textContent = taxPercent;
-}
 
+  updateChange();
+}
 
 function setMessage(text, type) {
   const box = $("cart-message");
@@ -227,9 +266,7 @@ function setMessage(text, type) {
   box.className = "message " + type;
 }
 
-
 function completeOrder() {
-  
   if (cart.length === 0) {
     setMessage("The cart is empty. Add at least one item first.", "error");
     return;
@@ -237,8 +274,20 @@ function completeOrder() {
 
   const totals = calculateTotals();
   const payment = document.querySelector('input[name="payment"]:checked').value;
+  const customerName = $("customer-name").value.trim() || "Walk-in Customer";
 
-  
+  let cashReceived = null;
+  let change = null;
+  if (payment === "Cash") {
+    const text = $("cash-received").value.trim();
+    cashReceived = text === "" ? totals.total : Number(text);
+    if (isNaN(cashReceived) || Math.round(cashReceived * 100) < Math.round(totals.total * 100)) {
+      setMessage("Cash received is less than the total.", "error");
+      return;
+    }
+    change = Math.round((cashReceived - totals.total) * 100) / 100;
+  }
+
   let itemCount = 0;
   const items = cart.map(function (cartItem) {
     const product = findProduct(cartItem.id);
@@ -253,6 +302,7 @@ function completeOrder() {
 
   const order = {
     orderNo: createOrderNumber(),
+    customerName: customerName,
     date: new Date().toISOString(),
     items: items,
     itemCount: itemCount,
@@ -260,21 +310,23 @@ function completeOrder() {
     taxPercent: taxPercent,
     tax: totals.tax,
     total: totals.total,
-    payment: payment
+    payment: payment,
+    cashReceived: cashReceived,
+    change: change
   };
 
   orders.push(order);
   saveOrders();
 
-  
   cart = [];
+  $("cash-received").value = "";
+  $("customer-name").value = "";
   setMessage("", "");
   renderCart();
   renderDashboard();
   showReceipt(order);
 }
 
-//Reciept
 function buildReceiptHTML(order) {
   const rows = order.items.map(function (item) {
     return '<tr>' +
@@ -285,6 +337,12 @@ function buildReceiptHTML(order) {
            '</tr>';
   }).join("");
 
+  let cashRows = "";
+  if (order.payment === "Cash" && typeof order.cashReceived === "number") {
+    cashRows = '<p><span>Cash received</span><span>' + formatMoney(order.cashReceived) + '</span></p>' +
+               '<p><span>Change</span><span>' + formatMoney(order.change) + '</span></p>';
+  }
+
   return '<div class="receipt">' +
            '<div class="receipt-header">' +
              '<h2>Brew &amp; Bite Café</h2>' +
@@ -292,7 +350,9 @@ function buildReceiptHTML(order) {
            '</div>' +
            '<div class="receipt-info">' +
              '<p><span>Receipt No:</span><strong>' + order.orderNo + '</strong></p>' +
-             '<p><span>Date:</span><span>' + formatDate(order.date) + '</span></p>' +
+             '<p><span>Customer:</span><span>' + escapeHTML(getCustomerName(order)) + '</span></p>' +
+             '<p><span>Date:</span><span>' + formatDateOnly(order.date) + '</span></p>' +
+             '<p><span>Time:</span><span>' + formatTimeOnly(order.date) + '</span></p>' +
              '<p><span>Payment:</span><span>' + order.payment + '</span></p>' +
            '</div>' +
            '<table>' +
@@ -303,6 +363,7 @@ function buildReceiptHTML(order) {
              '<p><span>Subtotal</span><span>' + formatMoney(order.subtotal) + '</span></p>' +
              '<p><span>Tax (' + order.taxPercent + '%)</span><span>' + formatMoney(order.tax) + '</span></p>' +
              '<p class="grand"><span>TOTAL</span><span>' + formatMoney(order.total) + '</span></p>' +
+             cashRows +
            '</div>' +
            '<div class="receipt-footer">' +
              '<p>Thank you for visiting Brew &amp; Bite Café!</p>' +
@@ -311,32 +372,51 @@ function buildReceiptHTML(order) {
          '</div>';
 }
 
-
 function showReceipt(order) {
   $("receipt-content").innerHTML = buildReceiptHTML(order);
   $("receipt-modal").classList.remove("hidden");
 }
 
-
 function closeReceipt() {
   $("receipt-modal").classList.add("hidden");
 }
 
-//Dashboard
-
 function renderDashboard() {
   let totalSales = 0;
   let totalItems = 0;
+  let todaySales = 0;
+  const soldCounts = {};
+  const todayString = new Date().toDateString();
+
   orders.forEach(function (order) {
     totalSales += order.total;
     totalItems += order.itemCount;
+
+    if (new Date(order.date).toDateString() === todayString) {
+      todaySales += order.total;
+    }
+
+    order.items.forEach(function (item) {
+      soldCounts[item.name] = (soldCounts[item.name] || 0) + item.qty;
+    });
   });
 
   $("stat-sales").textContent = formatMoney(Math.round(totalSales * 100) / 100);
+  $("stat-today").textContent = formatMoney(Math.round(todaySales * 100) / 100);
   $("stat-orders").textContent = orders.length;
   $("stat-items").textContent = totalItems;
 
-  
+  const medals = ["🥇", "🥈", "🥉"];
+  const top = Object.keys(soldCounts)
+    .map(function (name) { return { name: name, qty: soldCounts[name] }; })
+    .sort(function (a, b) { return b.qty - a.qty; })
+    .slice(0, 3);
+
+  $("top-empty").classList.toggle("hidden", top.length > 0);
+  $("top-list").innerHTML = top.map(function (item, index) {
+    return '<li><span>' + medals[index] + ' ' + item.name + '</span><strong>' + item.qty + ' sold</strong></li>';
+  }).join("");
+
   const recent = orders.slice(-5).reverse();
   $("recent-empty").classList.toggle("hidden", recent.length > 0);
   $("recent-table").classList.toggle("hidden", recent.length === 0);
@@ -344,6 +424,7 @@ function renderDashboard() {
   $("recent-body").innerHTML = recent.map(function (order) {
     return '<tr>' +
              '<td>' + order.orderNo + '</td>' +
+             '<td>' + escapeHTML(getCustomerName(order)) + '</td>' +
              '<td>' + formatDate(order.date) + '</td>' +
              '<td>' + order.itemCount + '</td>' +
              '<td>' + order.payment + '</td>' +
@@ -352,16 +433,23 @@ function renderDashboard() {
   }).join("");
 }
 
-
-
 function renderHistory() {
-  const list = orders.slice().reverse();   // newest first
+  const text = $("history-search").value.trim().toLowerCase();
+
+  const list = orders.slice().reverse().filter(function (order) {
+    return order.orderNo.toLowerCase().includes(text) ||
+           getCustomerName(order).toLowerCase().includes(text) ||
+           order.payment.toLowerCase().includes(text);
+  });
+
+  $("history-empty").textContent = orders.length === 0 ? "No saved orders yet." : "No orders match your search.";
   $("history-empty").classList.toggle("hidden", list.length > 0);
   $("history-table").classList.toggle("hidden", list.length === 0);
 
   $("history-body").innerHTML = list.map(function (order) {
     return '<tr>' +
              '<td>' + order.orderNo + '</td>' +
+             '<td>' + escapeHTML(getCustomerName(order)) + '</td>' +
              '<td>' + formatDate(order.date) + '</td>' +
              '<td>' + order.itemCount + '</td>' +
              '<td>' + order.payment + '</td>' +
@@ -391,7 +479,6 @@ document.querySelectorAll("[data-view]").forEach(function (element) {
   });
 });
 
-
 document.querySelectorAll(".filter-btn").forEach(function (btn) {
   btn.addEventListener("click", function () {
     currentCategory = btn.dataset.category;
@@ -402,6 +489,20 @@ document.querySelectorAll(".filter-btn").forEach(function (btn) {
   });
 });
 
+$("search-input").addEventListener("input", function () {
+  searchText = $("search-input").value;
+  renderMenu();
+});
+$("search-btn").addEventListener("click", function () {
+  searchText = $("search-input").value;
+  renderMenu();
+});
+$("search-clear-btn").addEventListener("click", function () {
+  $("search-input").value = "";
+  searchText = "";
+  renderMenu();
+  $("search-input").focus();
+});
 
 $("product-grid").addEventListener("click", function (event) {
   const card = event.target.closest(".product-card");
@@ -417,7 +518,6 @@ $("cart-items").addEventListener("click", function (event) {
   if (btn.dataset.action === "dec") changeQuantity(id, -1);
   if (btn.dataset.action === "remove") removeFromCart(id);
 });
-
 
 $("tax-rate").addEventListener("input", function () {
   const text = $("tax-rate").value.trim();
@@ -435,17 +535,20 @@ $("tax-rate").addEventListener("change", function () {
   const value = Number(text);
   if (text === "" || isNaN(value) || value < 0 || value > 100) {
     setMessage("Tax must be a number between 0 and 100.", "error");
-    $("tax-rate").value = taxPercent;   
+    $("tax-rate").value = taxPercent;
   }
+});
+
+$("cash-received").addEventListener("input", updateChange);
+document.querySelectorAll('input[name="payment"]').forEach(function (radio) {
+  radio.addEventListener("change", updateChange);
 });
 
 $("clear-cart-btn").addEventListener("click", clearCart);
 $("complete-order-btn").addEventListener("click", completeOrder);
 
-
 $("print-btn").addEventListener("click", function () { window.print(); });
 $("close-receipt-btn").addEventListener("click", closeReceipt);
-
 
 $("receipt-modal").addEventListener("click", function (event) {
   if (event.target === $("receipt-modal")) closeReceipt();
@@ -454,7 +557,6 @@ document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") closeReceipt();
 });
 
-
 $("history-body").addEventListener("click", function (event) {
   const btn = event.target.closest("button[data-order]");
   if (!btn) return;
@@ -462,8 +564,9 @@ $("history-body").addEventListener("click", function (event) {
   if (order) showReceipt(order);
 });
 
-$("clear-history-btn").addEventListener("click", clearHistory);
+$("history-search").addEventListener("input", renderHistory);
 
+$("clear-history-btn").addEventListener("click", clearHistory);
 
 $("tax-rate").value = taxPercent;
 renderMenu();
